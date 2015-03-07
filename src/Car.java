@@ -5,13 +5,16 @@ public class Car {
     private int triesToEnterParkingQuantity;
     private int patienceTime;
     private int stayTime;
+    private int totalTime;
 
-    public Car(String name, int distanceToParking, int triesToEnterParkingQuantity, int patienceTime, int stayTime) {
+    public Car(String name, int distanceToParking, int triesToEnterParkingQuantity, int patienceTime, int stayTime,
+               int totalTime) {
         this.name = name;
         this.distanceToParking = distanceToParking;
         this.triesToEnterParkingQuantity = triesToEnterParkingQuantity;
         this.patienceTime = patienceTime;
         this.stayTime = stayTime;
+        this.totalTime = totalTime;
     }
 
     public String getName() {
@@ -32,5 +35,9 @@ public class Car {
 
     public int getStayTime() {
         return stayTime;
+    }
+
+    public int getTotalTime(){
+        return totalTime;
     }
 }
