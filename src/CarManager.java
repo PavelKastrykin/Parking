@@ -5,7 +5,7 @@ public class CarManager extends Thread{
     public CarManager(Car car){
         this.car = car;
     }
-    
+
     public void run(){
         goToParking();
         enterParking();
