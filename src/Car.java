@@ -1,32 +1,40 @@
+import java.util.concurrent.TimeUnit;
 
-public class Car {
-    private String name;
+public class Car extends Thread{
+    private String brand;
     private int distanceToParking;
-    private int triesToEnterParkingQuantity;
     private int patienceTime;
     private int stayTime;
-    private int totalTime;
+    private boolean interrupted = false;
 
-    public Car(String name, int distanceToParking, int triesToEnterParkingQuantity, int patienceTime, int stayTime,
-               int totalTime) {
-        this.name = name;
+    public Car(String name, int distanceToParking, int patienceTime, int stayTime) {
+        this.brand = name;
         this.distanceToParking = distanceToParking;
-        this.triesToEnterParkingQuantity = triesToEnterParkingQuantity;
         this.patienceTime = patienceTime;
         this.stayTime = stayTime;
-        this.totalTime = totalTime;
     }
 
-    public String getName() {
-        return name;
+    public void run(){
+        try {
+            TimeUnit.SECONDS.sleep(patienceTime);
+        }
+
+        catch (InterruptedException e){
+            e.printStackTrace();
+        }
+        if (!isInterrupted()){
+            System.out.println();
+        }
+
+    }
+
+
+    public String getBrand() {
+        return brand;
     }
 
     public int getDistanceToParking() {
         return distanceToParking;
-    }
-
-    public int getTriesToEnterParkingQuantity() {
-        return triesToEnterParkingQuantity;
     }
 
     public int getPatienceTime() {
@@ -37,7 +45,8 @@ public class Car {
         return stayTime;
     }
 
-    public int getTotalTime(){
-        return totalTime;
+    public boolean isInterrupted(){
+        return interrupted;
     }
+
 }
