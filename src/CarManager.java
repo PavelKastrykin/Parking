@@ -80,10 +80,14 @@ public class CarManager extends Thread{
     private void leaveParking(){
         if (car.isInterrupted()){
             for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
-                entry.setValue(null);
-                break;
+                if (car.equals(entry.getValue())){
+                    entry.setValue(null);
+                    System.out.println("Car " + car.getBrand() + " left Parking. Bye-bye!");
+                    break;
+                }
+
             }
-            System.out.println("Car " + car.getBrand() + " left Parking. Bye-bye!");
+
         }
 
     }
