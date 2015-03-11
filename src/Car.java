@@ -5,13 +5,16 @@ public class Car extends Thread{
     private int distanceToParking;
     private int patienceTime;
     private int stayTime;
+    private int attemptsToSwitchPlace;
     private volatile boolean interrupted = false;
+    private volatile boolean hasSwithedPlace = false;
 
-    public Car(String brand, int distanceToParking, int patienceTime, int stayTime) {
+    public Car(String brand, int distanceToParking, int patienceTime, int stayTime, int attemptsToSwitchPlace) {
         this.brand = brand;
         this.distanceToParking = distanceToParking;
         this.patienceTime = patienceTime;
         this.stayTime = stayTime;
+        this.attemptsToSwitchPlace = attemptsToSwitchPlace;
     }
 
     public void run(){
@@ -54,6 +57,18 @@ public class Car extends Thread{
 
     public void setInterrupted(){
         interrupted = true;
+    }
+
+    public boolean isSwithedPlace(){
+        return hasSwithedPlace;
+    }
+
+    public void setSwithedPlace(){
+        hasSwithedPlace = true;
+    }
+
+    public int getAttemptsToSwitchPlace(){
+        return attemptsToSwitchPlace;
     }
 
     @Override
