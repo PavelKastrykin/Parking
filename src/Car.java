@@ -7,7 +7,7 @@ public class Car extends Thread{
     private int stayTime;
     private int attemptsToSwitchPlace;
     private volatile boolean interrupted = false;
-    private volatile boolean hasSwithedPlace = false;
+    private volatile boolean hasSwitchedPlace = false;
 
     public Car(String brand, int distanceToParking, int patienceTime, int stayTime, int attemptsToSwitchPlace) {
         this.brand = brand;
@@ -27,9 +27,8 @@ public class Car extends Thread{
         }
 
         if (!isInterrupted()){
-            System.out.println("Car " + getBrand() + " tired to wait and left home.");
             Parking.queueToEnterParking.remove(this);
-
+            System.out.println("Car " + getBrand() + " tired to wait and left home.");
         }
 
     }
@@ -59,12 +58,12 @@ public class Car extends Thread{
         interrupted = true;
     }
 
-    public boolean isSwithedPlace(){
-        return hasSwithedPlace;
+    public boolean isSwitchedPlace(){
+        return hasSwitchedPlace;
     }
 
-    public void setSwithedPlace(){
-        hasSwithedPlace = true;
+    public void setSwitchedPlace(){
+        hasSwitchedPlace = true;
     }
 
     public int getAttemptsToSwitchPlace(){

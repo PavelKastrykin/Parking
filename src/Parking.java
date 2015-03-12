@@ -1,11 +1,15 @@
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class Parking {
-    public static BlockingQueue<Car> queueToEnterParking = new ArrayBlockingQueue<Car>(50);
-    public static HashMap<Integer, Car> parkingPlaces;
+    public static volatile Queue<Car> queueToEnterParking = new ConcurrentLinkedQueue<Car>();
+    public static volatile HashMap<Integer, Car> parkingPlaces;
     static {
         parkingPlaces = new HashMap<Integer, Car>();
         parkingPlaces.put(1, null);

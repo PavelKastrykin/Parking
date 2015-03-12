@@ -1,11 +1,9 @@
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class CarManager extends Thread{
     private Car car;
-    Lock lock = new ReentrantLock();
+
     public CarManager(Car car){
         this.car = car;
     }
@@ -30,7 +28,7 @@ public class CarManager extends Thread{
         try {
             System.out.println("Car " + car.getBrand() + " now runs towards Parking.");
             TimeUnit.SECONDS.sleep(car.getDistanceToParking());
-            Parking.queueToEnterParking.add(car);
+            Parking.queueToEnterParking.offer(car);
             System.out.println("Car " + car.getBrand() + " stays in queue to enter Parking.");
             car.start();
         }
@@ -41,21 +39,20 @@ public class CarManager extends Thread{
 
     }
 
-    private synchronized void enterParking(){
-
+    private void enterParking(){
         if (!car.isInterrupted()){
-            try {
-                outer:
-                while (Parking.queueToEnterParking.contains(car)){
-                    if (Parking.parkingPlaces.containsValue(null)){
+            outer:
+            while (Parking.queueToEnterParking.contains(car)){
+                if (Parking.parkingPlaces.containsValue(null) && car.equals(Parking.queueToEnterParking.peek())){
+                    synchronized (Parking.parkingPlaces){
                         for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
                             if (entry.getValue() == null){
-                                lock.lock();
-                                entry.setValue(Parking.queueToEnterParking.take());
+
+                                entry.setValue(Parking.queueToEnterParking.poll());
                                 System.out.println("Car " + car.getBrand() + " took place at parking slot number "
                                         + entry.getKey());
                                 car.setInterrupted();
-                                lock.unlock();
+
                                 break outer;
 
                             }
@@ -63,20 +60,17 @@ public class CarManager extends Thread{
                     }
                 }
             }
-            catch (InterruptedException e){
-                e.printStackTrace();
-            }
         }
     }
 
-    private synchronized void stayAtParkingPlace(){
+    private void stayAtParkingPlace(){
         if (car.isInterrupted()){
             try {
                 int i;
                 for (i = 0; i < car.getAttemptsToSwitchPlace(); i++){
                     switchPlace();
                     TimeUnit.SECONDS.sleep(car.getStayTime()/car.getAttemptsToSwitchPlace());
-                    if (car.isSwithedPlace()){
+                    if (car.isSwitchedPlace()){
                         break;
                     }
                 }
@@ -88,37 +82,50 @@ public class CarManager extends Thread{
         }
     }
 
-    private synchronized void switchPlace(){
-        if (!Parking.parkingPlaces.containsValue(null)){
-            for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
-                if (!entry.getValue().isSwithedPlace() && !car.isSwithedPlace()){
-                    lock.lock();
-                    Integer thisParkingSlot = getParkingSlotNumber(car);
-                    Integer otherParkingSlot = entry.getKey();
-                    Parking.parkingPlaces.put(thisParkingSlot, entry.getValue());
-                    System.out.println("Car " + entry.getValue().getBrand() + " now stays at parking slot " + thisParkingSlot);
-                    entry.getValue().setSwithedPlace();
-                    Parking.parkingPlaces.put(otherParkingSlot, car);
-                    System.out.println("Car " + entry.getValue().getBrand() + " now stays at parking slot " + otherParkingSlot);
-                    car.setSwithedPlace();
-                    lock.unlock();
+    private void switchPlace(){
+        synchronized (Parking.parkingPlaces){
+            if (!Parking.parkingPlaces.containsValue(null)){
+                for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
+                    if (!entry.getValue().isSwitchedPlace() && !car.isSwitchedPlace()){
+                        if (entry.getKey().equals(this.getParkingSlotNumber(car))){
+                            continue;
+                        }
+                        Integer thisParkingSlot = getParkingSlotNumber(car);
+                        if (thisParkingSlot == null){
+                            break;
+                        }
+                        Integer otherParkingSlot = entry.getKey();
+                        Parking.parkingPlaces.put(thisParkingSlot, entry.getValue());
+                        System.out.println("Car " + entry.getValue().getBrand() + " now stays at parking slot number "
+                                + thisParkingSlot);
+                        entry.getValue().setSwitchedPlace();
+                        Parking.parkingPlaces.put(otherParkingSlot, car);
+                        System.out.println("Car " + entry.getValue().getBrand() + " now stays at parking slot number "
+                                + otherParkingSlot);
+                        car.setSwitchedPlace();
+                        break;
+                    }
                 }
             }
         }
 
+
     }
 
-    private synchronized void leaveParking(){
+    private void leaveParking() {
         if (car.isInterrupted()){
-            for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
 
-                if (car.equals(entry.getValue())){
-                    entry.setValue(null);
-                    System.out.println("Car " + car.getBrand() + " left parking slot number " + entry.getKey() + ". Bye-bye!");
-                    break;
+                for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
+
+                    if (car.equals(entry.getValue())){
+                        entry.setValue(null);
+                        System.out.println("Car " + car.getBrand() + " left parking slot number " + entry.getKey() + ". Bye-bye!");
+                        break;
+                    }
+
                 }
 
-            }
+
 
         }
 
