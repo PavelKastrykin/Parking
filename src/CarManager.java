@@ -35,8 +35,6 @@ public class CarManager extends Thread{
         catch (InterruptedException e){
             e.printStackTrace();
         }
-
-
     }
 
     private void enterParking(){
@@ -47,14 +45,11 @@ public class CarManager extends Thread{
                     synchronized (Parking.parkingPlaces){
                         for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
                             if (entry.getValue() == null){
-
                                 entry.setValue(Parking.queueToEnterParking.poll());
                                 System.out.println("Car " + car.getBrand() + " took place at parking slot number "
                                         + entry.getKey());
                                 car.setInterrupted();
-
                                 break outer;
-
                             }
                         }
                     }
@@ -108,26 +103,17 @@ public class CarManager extends Thread{
                 }
             }
         }
-
-
     }
 
     private void leaveParking() {
         if (car.isInterrupted()){
-
-                for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
-
-                    if (car.equals(entry.getValue())){
-                        entry.setValue(null);
-                        System.out.println("Car " + car.getBrand() + " left parking slot number " + entry.getKey() + ". Bye-bye!");
-                        break;
-                    }
-
+            for (Map.Entry<Integer, Car> entry : Parking.parkingPlaces.entrySet()){
+                if (car.equals(entry.getValue())){
+                    entry.setValue(null);
+                    System.out.println("Car " + car.getBrand() + " left parking slot number " + entry.getKey() + ". Bye-bye!");
+                    break;
                 }
-
-
-
+            }
         }
-
     }
 }
